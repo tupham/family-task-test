@@ -23,6 +23,12 @@ namespace DataLayer
                 entity.HasKey(k => k.Id);
                 entity.ToTable("Member");
             });
+
+            modelBuilder.Entity<Domain.DataModels.Task>(entity => {
+                entity.HasKey(k => k.Id);
+                entity.ToTable("Task");
+                
+            });
         }
     }
 }
