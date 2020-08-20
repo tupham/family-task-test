@@ -37,7 +37,7 @@
 
 @code {
     private List<FamilyMember> members;
-    private MenuItem[] leftMenuItem;
+    private List<MenuItem> leftMenuItem;
     private List<TaskModel> tasksToShow;
     private List<TaskModel> allTasks;
     private bool isLoaded;
@@ -51,6 +51,7 @@
         members = new List<FamilyMember>();
         allTasks = new List<TaskModel>();
         tasksToShow = new List<TaskModel>();
+        leftMenuItem = new List<MenuItem>();
         var result = await this.MemberDataService.GetAllMembers();
         if (result != null && result.Payload != null && result.Payload.Any())
         {
@@ -86,21 +87,21 @@
         }
 
 
-        leftMenuItem = new MenuItem[members.Count() + 1];
-        leftMenuItem[0] = new MenuItem {
+
+        leftMenuItem.Add(new MenuItem {
             label = "All Tasks",
             referenceId = Guid.Empty,
             isActive = true
-        };
+        });
         leftMenuItem[0].ClickCallback += showAllTasks;
         for (int i = 1; i < members.Count() + 1; i++)
         {
-            leftMenuItem[i] = new MenuItem {
+            leftMenuItem.Add(new MenuItem {
                 iconColor = members[i-1].avtar,
                 label = members[i-1].firstname,
                 referenceId = members[i-1].id,
                 isActive = false
-            };
+            });
             leftMenuItem[i].ClickCallback += onItemClick;
         }
         showAllTasks(null, leftMenuItem[0]);
@@ -152,8 +153,40 @@
         }
     }
 
-    private void onMemberAdd() {
-        Console.WriteLine("on member add");
+    private async void onMemberAdd(FamilyMember member) {
+        Console.WriteLine("on member add: ");
+        Console.WriteLine(member);
+        var result = await MemberDataService.Create(new Domain.Commands.CreateMemberCommand()
+        {
+            Avatar = member.avtar,
+            FirstName = member.firstname,
+            LastName = member.lastname,
+            Email = member.email,
+            Roles = member.role
+        });
+        if (result != null && result.Payload != null && result.Payload.Id != Guid.Empty)
+        {
+            members.Add(new FamilyMember()
+            {
+                avtar = result.Payload.Avatar,
+                email = result.Payload.Email,
+                firstname = result.Payload.FirstName,
+                lastname = result.Payload.LastName,
+                role = result.Payload.Roles,
+                id = result.Payload.Id
+            });
+            var newMenuItem = new MenuItem
+            {
+                iconColor = result.Payload.Avatar,
+                label = result.Payload.FirstName,
+                referenceId = result.Payload.Id
+            };
+            newMenuItem.ClickCallback += onItemClick;
+            leftMenuItem.Add(newMenuItem);
+
+            showCreator = false;
+            StateHasChanged();
+        }
     }
 
     private async void onAddTaskClick()

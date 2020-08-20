@@ -63,7 +63,7 @@
 </style>
 
 <div class="menu-wrapper col-12 p-0">
-    @if(MenuItems != null && MenuItems.Length > 0) {
+    @if(MenuItems != null && MenuItems.Count() > 0) {
         @foreach (var item in MenuItems) {
             <div class="menu-item col-10 offset-1 p-3 my-4 p-sm-2 @(item.isActive ? "active" : "")" @onclick="@(e => item.InvokClickCallback(item))">
                 @if(item.iconColor != null) {
@@ -80,7 +80,7 @@
 </div>
 
 @code {
-    [Parameter] public MenuItem[] MenuItems {get; set;}
+    [Parameter] public List<MenuItem> MenuItems {get; set;}
 
     [Parameter] public EventCallback OnAddItem {get; set;}
 }

@@ -14,6 +14,7 @@ namespace WebClient.Pages
 		public ITaskDataService TaskDataService { get; set; }
 		[Inject]
 		public IMemberDataService MemberDataService { get; set; }
-		
-	}
+
+       
+    }
 }
