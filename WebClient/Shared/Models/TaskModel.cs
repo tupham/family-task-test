@@ -10,10 +10,10 @@ public class TaskModel
 	public override string ToString()
 	{
 		var stringBuilder = new StringBuilder();
-		stringBuilder.AppendFormat("id: {0}, text: {1}\n", this.id, this.text);
+		stringBuilder.AppendFormat("id: {0}, text: {1}, isDone: {2}\n", this.id, this.text, this.isDone);
 		if (member != null)
 		{
-			stringBuilder.AppendFormat("id: {0}, first_name: {1}", this.member.id, this.member.firstname);
+			stringBuilder.AppendFormat("Member: id: {0}, first_name: {1}", this.member.id, this.member.firstname);
 		}
 		return stringBuilder.ToString();
 	}

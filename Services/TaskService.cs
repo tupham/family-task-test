@@ -34,6 +34,30 @@ namespace Services
 			};
 		}
 
+		public async Task<UpdateTaskCommandResult> UpdateTaskCommandHandler(UpdateTaskCommand command)
+		{
+			var isSucceed = true;
+			var task = await this._taskRepository.ByIdAsync(command.Id);
+
+			_mapper.Map<UpdateTaskCommand, Domain.DataModels.Task>(command, task);
+
+			var affectedRecordsCount = await this._taskRepository.UpdateRecordAsync(task);
+
+			if (affectedRecordsCount < 1)
+				isSucceed = false;
+
+			return new UpdateTaskCommandResult()
+			{
+				Succeed = isSucceed
+			};
+		}
+
+		public async Task<DeleteTaskCommandResult> DeleteTask(Guid id)
+		{			
+			var result = await this._taskRepository.DeleteRecordAsync(id);
+			return new DeleteTaskCommandResult() { Succeed = result!=0};
+		}
+
 		public async Task<GetAllTasksQueryResult> GetAllTasksQueryHandler()
 		{
 			IEnumerable<TaskVm> vm = new List<TaskVm>();

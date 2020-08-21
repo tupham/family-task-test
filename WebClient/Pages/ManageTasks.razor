@@ -23,7 +23,7 @@
                     </div>
                 </div>
                 <div class="col-10 offset-1">
-                    <TaskListerComponent Tasks="@tasksToShow"/>
+                    <TaskListerComponent Tasks="@tasksToShow" onDeleteCallback="@onDeleteTask" onUpdateCallback="@onUpdateTask"/>
                 </div>
             }
             @if(showCreator) {
@@ -75,6 +75,7 @@
             foreach(var taskItem in taskResults.Payload)
             {
                 allTasks.Add(new TaskModel() {
+                    id = taskItem.Id,
                     text = taskItem.Subject,
                     isDone = taskItem.IsComplete,
                     member = new FamilyMember(){
@@ -213,5 +214,61 @@
             this.task.text = string.Empty;
             StateHasChanged();
         }
+    }
+
+    private async void onDeleteTask(TaskModel task)
+    {
+        Console.WriteLine("on delete task");
+        Console.WriteLine(task);
+        var deleteTaskCommand = new Domain.Commands.DeleteTaskCommand() { Id = task.id};
+        var result = await TaskDataService.Delete(deleteTaskCommand);
+        if(result !=null && result.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            Console.WriteLine(result.Content);
+            int indexToRemove = -1;
+            for(var i = 0; i< this.tasksToShow.Count(); i++)
+            {
+                if(task.id == this.tasksToShow[i].id)
+                {
+                    indexToRemove = i;
+                    break;
+                }
+            }
+            if (indexToRemove != -1)
+            {
+                this.tasksToShow.RemoveAt(indexToRemove);
+            }
+
+            int indexToRemoveInAllTasks = -1;
+
+            for(var j = 0; j< this.allTasks.Count(); j++)
+            {
+                if(task.id == this.allTasks[j].id)
+                {
+                    indexToRemoveInAllTasks = j;
+                    break;
+                }
+            }
+
+            if (indexToRemoveInAllTasks != -1)
+            {
+                this.allTasks.RemoveAt(indexToRemoveInAllTasks);
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async void onUpdateTask(TaskModel task)
+    {
+        Console.WriteLine("on update task");
+        Console.WriteLine(task);
+        var updateTaskCommand = new Domain.Commands.UpdateTaskCommand() { 
+            IsComplete = task.isDone,
+            Subject = task.text,
+            Id = task.id,
+            AssignedToId = task.member.id
+        };
+        var result = await TaskDataService.Update(updateTaskCommand);
     }
 }

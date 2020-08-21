@@ -23,6 +23,16 @@ namespace WebClient.Services
 			return await _httpClient.PostJsonAsync<CreateTaskCommandResult>("tasks", command);
 		}
 
+		public async Task<UpdateTaskCommandResult> Update(UpdateTaskCommand command)
+		{
+			return await this._httpClient.PutJsonAsync<UpdateTaskCommandResult>("tasks/"+command.Id, command);
+		}
+
+		public async Task<HttpResponseMessage> Delete(DeleteTaskCommand command)
+		{
+			return await _httpClient.DeleteAsync("tasks/"+command.Id);
+		}
+
 		public async Task<GetAllTasksQueryResult> GetAllTasks()
 		{
 			return await _httpClient.GetJsonAsync<GetAllTasksQueryResult>("tasks");
